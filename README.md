@@ -1,6 +1,15 @@
-# Game + Stream Recommender
+# Game + Stream Recommender 01/25/2025 - 05/20/2025 (College Project)
 
-Pick a genre (or type your own) and get a random game from RAWG plus a live Twitch stream playing it. Node 18+, zero dependencies.
+Stream Live Games is a full-stack web app that connects game discovery with live streaming. The user picks a genre, the app recommends a random game from the RAWG.io API, and then finds a live Twitch stream of that game through the Twitch API and embeds it on the page.
+
+# How it works?
+Pick a genre (or type your own) and get a random game from RAWG plus a live Twitch stream playing it. 
+
+Frontend: HTML,CSS, JavaScript
+Backend: Node.js APIs: RAWG.io API, Twitch API
+Tools: VS Code, 
+
+- zero dependencies.
 
 ## Setup
 1. `cp credentials.example.json credentials.json`
@@ -12,7 +21,7 @@ Pick a genre (or type your own) and get a random game from RAWG plus a live Twit
 ## Hosting (e.g. Render)
 Set these environment variables instead of using credentials.json:
 `RAWG_API_KEY`, `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET`
-Build command: *(leave empty)* — Start command: `npm start`
+ Start command: `npm start`
 
 ## How it works
 
