@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game + Stream Recommendation</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; max-width: 800px; margin: 20px auto; padding: 0 16px; }
+    form { display: grid; gap: 14px; }
+    select, input[type=text], button { font: inherit; padding: 6px 10px; }
+    #game img { max-width: 100%; border-radius: 8px; }
+    iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; }
+  </style>
+</head>
+<body>
+  <form id="form">
+    <label>Preferred genre: <select id="genre"></select></label>
+    <label id="otherBox" hidden>Your genre: <input id="other" type="text" placeholder="e.g. zombies, cozy, roguelike"></label>
+    <button type="submit">Find game &amp; stream</button>
+  </form>
+  <main id="result"></main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    // Build an element safely (textContent, never innerHTML, so API data can't inject HTML)
+    const el = (tag, props = {}, ...kids) => {
+      const node = Object.assign(document.createElement(tag), props);
+      node.append(...kids);
+      return node;
+    };
+
+    // Prebuilt genres: [label, RAWG genre slug]
+    const GENRES = [
+      ["Action", "action"], ["Adventure", "adventure"], ["RPG", "role-playing-games-rpg"],
+      ["Shooter", "shooter"], ["Strategy", "strategy"], ["Simulation", "simulation"],
+      ["Puzzle", "puzzle"], ["Racing", "racing"], ["Sports", "sports"],
+      ["Fighting", "fighting"], ["Platformer", "platformer"], ["Indie", "indie"],
+      ["Casual", "casual"], ["Arcade", "arcade"], ["Multiplayer (MMO)", "massively-multiplayer"],
+    ];
+    $("genre").replaceChildren(
+      el("option", { value: "", textContent: "Select a genre…" }),
+      ...GENRES.map(([name, slug]) => el("option", { value: slug, textContent: name })),
+      el("option", { value: "other", textContent: "Other…" })
+    );
+
+    // Show the text box only when "Other" is selected
+    $("genre").addEventListener("change", () => {
+      const isOther = $("genre").value === "other";
+      $("otherBox").hidden = !isOther;
+      if (isOther) $("other").focus();
+    });
+
+    $("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const isOther = $("genre").value === "other";
+      const other = isOther ? $("other").value.trim() : "";
+      if (!isOther && !$("genre").value) return $("result").replaceChildren(el("p", {}, "Select a genre first."));
+      if (isOther && !other) return $("result").replaceChildren(el("p", {}, "Type a genre first."));
+      $("result").replaceChildren(el("p", {}, "Searching…"));
+      try {
+        const res = await fetch(`/api/recommend?${new URLSearchParams(isOther ? { other } : { genre: $("genre").value })}`);
+        const { game, stream, missing, error } = await res.json();
+        if (error) throw new Error(error);
+        if (missing) return $("result").replaceChildren(el("p", {}, `The genre "${missing}" doesn't exist on Twitch.`));
+        if (!game) return $("result").replaceChildren(el("p", {}, "No games found for that genre."));
+
+        const out = [el("h2", {}, `Game recommendation: ${game.name}`)];
+        if (game.image) out.push(el("div", { id: "game" }, el("img", { src: game.image, alt: game.name })));
+        if (!stream) {
+          out.push(el("p", {}, "No live streams for this game right now. Try again."));
+        } else {
+          out.push(
+            el("p", {},
+              "Live now: ", el("a", { href: `https://twitch.tv/${stream.user_login}`, target: "_blank", rel: "noopener", textContent: stream.user_name }),
+              ` — ${stream.viewer_count.toLocaleString()} viewers`, el("br"), stream.title),
+            // Twitch requires the embedding site's hostname as "parent"
+            el("iframe", { src: `https://player.twitch.tv/?channel=${stream.user_login}&parent=${location.hostname}`, allowFullscreen: true })
+          );
+        }
+        $("result").replaceChildren(...out);
+      } catch (err) {
+        $("result").replaceChildren(el("p", {}, `Something went wrong: ${err.message}`));
+      }
+    });
+  </script>
+</body>
+</html>

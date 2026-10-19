@@ -1,0 +1,9 @@
+{
+  "name": "game-stream-recommender",
+  "version": "1.0.0",
+  "description": "Pick a genre, get a random game and a live Twitch stream for it (RAWG + Twitch APIs).",
+  "main": "index.js",
+  "scripts": { "start": "node index.js" },
+  "engines": { "node": ">=18" },
+  "license": "MIT"
+}
