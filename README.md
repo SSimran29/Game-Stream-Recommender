@@ -9,8 +9,6 @@ Frontend: HTML,CSS, JavaScript
 Backend: Node.js APIs: RAWG.io API, Twitch API
 Tools: VS Code, 
 
-- zero dependencies.
-
 ## Setup
 1. `cp credentials.example.json credentials.json`
 2. Fill in your RAWG API key and Twitch client ID/secret.
