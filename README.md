@@ -16,13 +16,6 @@ Tools: VS Code,
 2. Fill in your RAWG API key and Twitch client ID/secret.
 3. `npm start`, then open http://localhost:3000
 
-`credentials.json` is git-ignored. Never commit it.
-
-## Hosting (e.g. Render)
-Set these environment variables instead of using credentials.json:
-`RAWG_API_KEY`, `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET`
- Start command: `npm start`
-
 ## How it works
 
 ```mermaid
